@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 //import com.mysql.cj.xdevapi.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -35,9 +34,8 @@ public class Menu extends javax.swing.JFrame {
     public String payRateFin;
     /**
      * Creates new form Menu
-     * @throws SQLException
      */
-    public Menu() throws SQLException {
+    public Menu() {
         initComponents();
         cardLayout =(CardLayout) cardPanel.getLayout();
         cardInner = (CardLayout) addCard.getLayout();
@@ -45,22 +43,6 @@ public class Menu extends javax.swing.JFrame {
     }
     
     
-    public Statement Connect(){
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/casestudy", "root", "");
-
-            //Declare statement for insertion to database
-            return (Statement) con.createStatement();
-
-            }
-        catch (Exception e) {
-        System.out.println(e.getMessage());
-        return null;
-        }
-    } 
-    
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -68,7 +50,7 @@ public class Menu extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() throws SQLException{
+    private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jFrame1 = new javax.swing.JFrame();
@@ -3159,12 +3141,7 @@ public class Menu extends javax.swing.JFrame {
         payEdit.setBackground(new java.awt.Color(2, 63, 120));
         payEdit.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                try {
-                    payEditMouseClicked(evt);
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                payEditMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 payEditMouseEntered(evt);
@@ -3435,28 +3412,36 @@ public class Menu extends javax.swing.JFrame {
     private void empAddMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_empAddMouseEntered
         empAdd.setBackground(new java.awt.Color(26,43,129));
     }//GEN-LAST:event_empAddMouseEntered
-
-    private void loadPay() throws SQLException{
+    private void loadPay(){
         DefaultTableModel tblModel = (DefaultTableModel) payTable.getModel();
         tblModel.setRowCount(0);
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/casestudy", "root", "");
 
+            //Declare statement for insertion to database
+            Statement st = (Statement) con.createStatement();
 
-        String sql = "SELECT * from payRoll";
-        ResultSet rs = Connect().executeQuery(sql);
-        while(rs.next()){
-            String totalPay = String.valueOf(rs.getString("totalPay"));
-            String deduction = String.valueOf(rs.getString("deduction"));
-            String overtimePay = String.valueOf(rs.getString("overtimePay"));
-            String allowance = String.valueOf(rs.getString("allowance"));
-            String employeeId = String.valueOf(rs.getString("employeeId"));
-            String tbData[] = {totalPay, deduction, overtimePay, allowance, employeeId}; 
-            System.out.println("added now");
-            tblModel.addRow(tbData); 
-        }
+            String sql = "SELECT * from payRoll";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                String totalPay = String.valueOf(rs.getString("totalPay"));
+                String deduction = String.valueOf(rs.getString("deduction"));
+                String overtimePay = String.valueOf(rs.getString("overtimePay"));
+                String allowance = String.valueOf(rs.getString("allowance"));
+                String employeeId = String.valueOf(rs.getString("employeeId"));
+                String tbData[] = {totalPay, deduction, overtimePay, allowance, employeeId}; 
+                System.out.println("added now");
+                tblModel.addRow(tbData); 
+            }
+        con.close();
+        }catch (Exception e) {
+        System.out.println(e.getMessage());
+        }        
         cardLayout.show(cardPanel,"c103");
-    }      
-  
-    
+
+        
+    }
     
     private void loadManage(int table){
 
@@ -3693,7 +3678,7 @@ public class Menu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_payAddMousePressed
 
-    private void payEditMouseClicked(java.awt.event.MouseEvent evt) throws SQLException {//GEN-FIRST:event_payEditMouseClicked
+    private void payEditMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payEditMouseClicked
         loadPay();
     }//GEN-LAST:event_payEditMouseClicked
 
@@ -4919,12 +4904,7 @@ public class Menu extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    new Menu().setVisible(true);
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                new Menu().setVisible(true);
             }
         });
     }
